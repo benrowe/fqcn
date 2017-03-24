@@ -73,8 +73,7 @@ class Resolver
 
         // find the best matching prefix!
         foreach ($prefixes as $prefix) {
-            if (
-                substr($namespace, 0, strlen($prefix)) == $prefix &&
+            if (substr($namespace, 0, strlen($prefix)) == $prefix &&
                 strlen($prefix) > strlen($prefixResult)
             ) {
                 $prefixResult = $prefix;
