@@ -127,4 +127,18 @@ class Resolver
 
         return $path ?: '';
     }
+
+
+    /**
+     * Retrieve a directory iterator for the supplied path
+     *
+     * @param  string $path The directory to iterate
+     * @return \RegexIterator
+     */
+    private function getDirectoryIterator(string $path): \RegexIterator
+    {
+        $dirIterator = new \RecursiveDirectoryIterator($path);
+        $iterator = new \RecursiveIteratorIterator($dirIterator);
+        return new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
+    }
 }
