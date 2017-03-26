@@ -58,8 +58,10 @@ class ResolveTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([
             'Benrowe\Fqcn\Test\Base',
             'Benrowe\Fqcn\Test\ExampleBase',
+            'Benrowe\Fqcn\Test\Example\AnotherTrait',
+            'Benrowe\Fqcn\Test\Example\ExampleBase',
+            'Benrowe\Fqcn\Test\Example\SomeInterface',
             'Benrowe\Fqcn\Test\Standalone',
-            'Benrowe\Fqcn\Test\Example\ExampleBase'
         ], $this->resolve->findClasses(__NAMESPACE__.'\\Test'));
     }
 
