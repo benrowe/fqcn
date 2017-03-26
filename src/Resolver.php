@@ -7,13 +7,16 @@ namespace Benrowe\Fqcn;
 use Composer\Autoload\ClassLoader;
 
 /**
- * Class Resolver
+ * Resolver
+ * Resolve a php psr4 namespace to a directory
  *
  * @package Benrowe\Fqcn
  */
 class Resolver
 {
     /**
+     * Instance of composer, since this will be used to load the ps4 prefixes
+     *
      * @var ClassLoader
      */
     private $composer;
