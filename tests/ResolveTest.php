@@ -65,6 +65,14 @@ class ResolveTest extends \PHPUnit_Framework_TestCase
         ], $this->resolve->findClasses(__NAMESPACE__.'\\Test'));
     }
 
+    public function testFindClassesInstanceOf()
+    {
+        $this->assertSame([
+            'Benrowe\Fqcn\Test\ExampleBase',
+            'Benrowe\Fqcn\Test\Example\ExampleBase',
+        ], $this->resolve->findClasses(__NAMESPACE__.'\\Test', __NAMESPACE__.'\\Test\\Base'));
+    }
+
     public function dataInvalidNamespace()
     {
         return [
