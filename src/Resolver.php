@@ -66,9 +66,10 @@ class Resolver
         sort($classes);
 
         if ($instanceOf) {
-            $classes = array_filter($classes, function ($className) use ($instanceOf) {
-                return $className instanceof $instanceOf;
-            });
+            $classes = array_values(array_filter($classes, function ($className) use ($instanceOf) {
+                return is_subclass_of($className, $instanceOf);
+            }));
+
         }
 
         return $classes;
