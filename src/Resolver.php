@@ -38,6 +38,43 @@ class Resolver
     }
 
     /**
+     * Find all of the avaiable classes under a specific namespace
+     *
+     * @param  string $namespace  The namespace to search for
+     * @param  string $instanceOf optional, restrict the classes found to those
+     *                            that extend from this base
+     * @return array a list of FQCN's that match
+     */
+    public function findClasses(string $namespace, string $instanceOf = null): array
+    {
+        $availablePaths = $this->resolveDirectory($namespace);
+
+        $classes = [];
+        foreach ($availablePaths as $path) {
+            foreach ($this->getDirectoryIterator($path) as $file) {
+                $fqcn = $namespace.strtr(substr($file[0], strlen($path), -4), '//', '\\');
+                try {
+                    // test if the class exists
+                    new \ReflectionClass($fqcn);
+                    $classes[] = $fqcn;
+                } catch (\ReflectionException $e) {
+                    // could not load the class/interface/trait
+                }
+            }
+        }
+
+        sort($classes);
+
+        if ($instanceOf) {
+            $classes = array_filter($classes, function ($className) use ($instanceOf) {
+                return $className instanceof $instanceOf;
+            });
+        }
+
+        return $classes;
+    }
+
+    /**
      * Resolve a psr4 based namespace to an absolute directory
      *
      * @param string $namespace
