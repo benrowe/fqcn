@@ -47,12 +47,8 @@ class Resolver
         foreach ($availablePaths as $path) {
             foreach ($this->getDirectoryIterator($path) as $file) {
                 $fqcn = $namespace.strtr(substr($file[0], strlen($path), -4), '//', '\\');
-                try {
-                    // test if the class exists
-                    new \ReflectionClass($fqcn);
-                    $classes[] = $fqcn;
-                } catch (\ReflectionException $e) {
-                    // could not load the class/interface/trait
+                if (class_exists($fqcn) || interface_existS($fqcn) || trait_exists($fqcn)) {
+                    $classes[] = $fqcn;   
                 }
             }
         }
