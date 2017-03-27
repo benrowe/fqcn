@@ -77,13 +77,16 @@ class Resolver
         $namespace = $this->normalise($namespace);
 
         $prefixes = $this->composer->getPrefixesPsr4();
+        // pluck the best namespace from the available
         $prefix   = $this->findPrefix($namespace, array_keys($prefixes));
         if (!$prefix) {
             throw new Exception('Could not find registered psr4 prefix that matches '.$namespace);
         }
 
+        $directories = $prefixes[$prefix];
+
         $discovered = [];
-        foreach ($prefixes[$prefix] as $path) {
+        foreach ($directories as $path) {
             $path = $this->findAbsolutePathForPsr4($namespace, $prefix, $path);
             // convert the rest of the relative path, from the prefix into a directory slug
             if ($path && is_dir($path)) {
