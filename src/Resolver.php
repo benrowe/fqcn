@@ -66,10 +66,10 @@ class Resolver
     }
 
     /**
-     * Resolve a psr4 based namespace to an absolute directory
+     * Resolve a psr4 based namespace to a list of absolute directory paths
      *
      * @param string $namespace
-     * @return array
+     * @return array list of directories this namespace is mapped to
      * @throws Exception
      */
     public function resolveDirectory(string $namespace): array
