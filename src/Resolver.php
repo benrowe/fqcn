@@ -178,21 +178,33 @@ class Resolver
         $iterator = new \RecursiveIteratorIterator($dirIterator);
         return new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
     }
-    
+
     /**
      * Determine if the construct (class, interface or trait) exists
-     * 
+     *
      * @param string $artifactName
      * @return bool
      */
     private function langaugeConstructExists(string $artifactName): bool
     {
         return
-            class_exists($artifactName, false) || 
-            interface_exists($artifactName, false) || 
-            trait_exists($artifactName, false) ||
-            class_exists($artifactName) || 
-            interface_exists($artifactName) || 
-            trait_exists($artifactName);
+            $this->checkConstructExists($artifactName, false) ||
+            $this->checkConstructExists($artifactName);
+    }
+
+    /**
+     * Determine if the contract exists
+     *
+     * @param  string $artifactName
+     * @param  bool $autoload trigger the autoloader to be fired, if the construct
+     *                        doesn't exist
+     * @return bool
+     */
+    private function checkConstructExists(string $artifactName, bool $autoload = true): bool
+    {
+        return
+            class_exists($artifactName, $autoload) ||
+            interface_exists($artifactName, $autoload) ||
+            trait_exists($artifactName, $autoload);
     }
 }
