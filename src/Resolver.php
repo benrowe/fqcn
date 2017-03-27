@@ -41,12 +41,13 @@ class Resolver
      */
     public function findClasses(string $namespace, string $instanceOf = null): array
     {
+        $namespace = $this->normalise($namespace);
         $availablePaths = $this->resolveDirectory($namespace);
 
         $classes = [];
         foreach ($availablePaths as $path) {
             foreach ($this->getDirectoryIterator($path) as $file) {
-                $fqcn = $namespace.strtr(substr($file[0], strlen($path), -4), '//', '\\');
+                $fqcn = $namespace.strtr(substr($file[0], strlen($path) + 1, -4), '//', '\\');
                 if ($this->langaugeConstructExists($fqcn)) {
                     $classes[] = $fqcn;   
                 }
