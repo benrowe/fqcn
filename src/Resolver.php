@@ -49,7 +49,7 @@ class Resolver
             foreach ($this->getDirectoryIterator($path) as $file) {
                 $fqcn = $namespace.strtr(substr($file[0], strlen($path) + 1, -4), '//', '\\');
                 if ($this->langaugeConstructExists($fqcn)) {
-                    $classes[] = $fqcn;   
+                    $classes[] = $fqcn;
                 }
             }
         }
