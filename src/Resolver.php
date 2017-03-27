@@ -7,31 +7,65 @@ namespace Benrowe\Fqcn;
 use Composer\Autoload\ClassLoader;
 
 /**
- * Class Resolver
+ * Resolver
+ * Resolve a php psr4 namespace to a directory
  *
  * @package Benrowe\Fqcn
  */
 class Resolver
 {
     /**
+     * Instance of composer, since this will be used to load the ps4 prefixes
+     *
      * @var ClassLoader
      */
     private $composer;
 
     /**
-     * @var array
-     */
-    private $extensions = ['.php'];
-
-    /**
      * Resolver constructor.
      *
      * @param ClassLoader $composer
-     * @param array       $extensions
      */
-    public function __construct(ClassLoader $composer, $extensions = null)
+    public function __construct(ClassLoader $composer)
     {
         $this->composer = $composer;
+    }
+
+    /**
+     * Find all of the avaiable classes under a specific namespace
+     *
+     * @param  string $namespace  The namespace to search for
+     * @param  string $instanceOf optional, restrict the classes found to those
+     *                            that extend from this base
+     * @return array a list of FQCN's that match
+     */
+    public function findClasses(string $namespace, string $instanceOf = null): array
+    {
+        $availablePaths = $this->resolveDirectory($namespace);
+
+        $classes = [];
+        foreach ($availablePaths as $path) {
+            foreach ($this->getDirectoryIterator($path) as $file) {
+                $fqcn = $namespace.strtr(substr($file[0], strlen($path), -4), '//', '\\');
+                try {
+                    // test if the class exists
+                    new \ReflectionClass($fqcn);
+                    $classes[] = $fqcn;
+                } catch (\ReflectionException $e) {
+                    // could not load the class/interface/trait
+                }
+            }
+        }
+
+        sort($classes);
+
+        if ($instanceOf) {
+            $classes = array_values(array_filter($classes, function ($className) use ($instanceOf) {
+                return is_subclass_of($className, $instanceOf);
+            }));
+        }
+
+        return $classes;
     }
 
     /**
@@ -63,6 +97,9 @@ class Resolver
     }
 
     /**
+     * Find the best psr4 namespace prefix, based on the supplied namespace, and
+     * list of provided prefix
+     *
      * @param string $namespace
      * @param array  $prefixes
      * @return string
@@ -73,6 +110,7 @@ class Resolver
 
         // find the best matching prefix!
         foreach ($prefixes as $prefix) {
+            // if we have a match, and it's longer than the previous match
             if (substr($namespace, 0, strlen($prefix)) == $prefix &&
                 strlen($prefix) > strlen($prefixResult)
             ) {
@@ -84,6 +122,7 @@ class Resolver
 
     /**
      * Convert the supplied namespace string into a standard format
+     * no prefix, ends with trailing slash
      *
      * Example:
      * Psr4\Prefix\
@@ -95,7 +134,6 @@ class Resolver
      */
     private function normalise(string $namespace): string
     {
-
         $tidy = trim($namespace, '\\');
         if (!$tidy) {
             throw new Exception('Invalid namespace', 100);
@@ -105,13 +143,15 @@ class Resolver
     }
 
     /**
-     * Get an absolute path for the provided namespace, based on a existing directory and its psr4 prefix
+     * Get an absolute path for the provided namespace, based on a existing
+     * directory and its psr4 prefix
      *
      * @param string $namespace
      * @param string $psr4Prefix the psr4 prefix
      * @param string $psr4Path and it's related path
-     * @return string the absolute directory path the provided namespace, given the correct prefix and path
-     *                empty string if path cant be resolved
+     * @return string the absolute directory path the provided namespace, given
+     *                    the correct prefix and path empty string if path can't
+     *                    be resolved
      */
     private function findAbsolutePathForPsr4(string $namespace, string $psr4Prefix, string $psr4Path): string
     {
@@ -126,5 +166,19 @@ class Resolver
         $path = realpath($path);
 
         return $path ?: '';
+    }
+
+
+    /**
+     * Retrieve a directory iterator for the supplied path
+     *
+     * @param  string $path The directory to iterate
+     * @return \RegexIterator
+     */
+    private function getDirectoryIterator(string $path): \RegexIterator
+    {
+        $dirIterator = new \RecursiveDirectoryIterator($path);
+        $iterator = new \RecursiveIteratorIterator($dirIterator);
+        return new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
     }
 }
