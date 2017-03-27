@@ -47,7 +47,7 @@ class Resolver
         foreach ($availablePaths as $path) {
             foreach ($this->getDirectoryIterator($path) as $file) {
                 $fqcn = $namespace.strtr(substr($file[0], strlen($path), -4), '//', '\\');
-                if (class_exists($fqcn) || interface_existS($fqcn) || trait_exists($fqcn)) {
+                if ($this->langaugeConstructExists($fqcn)) {
                     $classes[] = $fqcn;   
                 }
             }
@@ -176,5 +176,22 @@ class Resolver
         $dirIterator = new \RecursiveDirectoryIterator($path);
         $iterator = new \RecursiveIteratorIterator($dirIterator);
         return new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
+    }
+    
+    /**
+     * Determine if the construct (class, interface or trait) exists
+     * 
+     * @param string $artifactName
+     * @return bool
+     */
+    private function langaugeConstructExists(string $artifactName): bool
+    {
+        return
+            class_exists($artifactName, false) || 
+            interface_exists($artifactName, false) || 
+            trait_exists($artifactName, false) ||
+            class_exists($artifactName) || 
+            interface_exists($artifactName) || 
+            trait_exists($artifactName);
     }
 }
