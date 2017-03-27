@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace Benrowe\Fqcn;
 
 use Composer\Autoload\ClassLoader;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RecursiveRegexIterator;
+use RegexIterator;
+
 
 /**
  * Resolver
@@ -173,13 +178,13 @@ class Resolver
      * Retrieve a directory iterator for the supplied path
      *
      * @param  string $path The directory to iterate
-     * @return \RegexIterator
+     * @return RegexIterator
      */
-    private function getDirectoryIterator(string $path): \RegexIterator
+    private function getDirectoryIterator(string $path): RegexIterator
     {
-        $dirIterator = new \RecursiveDirectoryIterator($path);
-        $iterator = new \RecursiveIteratorIterator($dirIterator);
-        return new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
+        $dirIterator = new RecursiveDirectoryIterator($path);
+        $iterator = new RecursiveIteratorIterator($dirIterator);
+        return new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
     }
 
     /**
