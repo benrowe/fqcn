@@ -22,17 +22,11 @@ class Resolver
     private $composer;
 
     /**
-     * @var array
-     */
-    private $extensions = ['.php'];
-
-    /**
      * Resolver constructor.
      *
      * @param ClassLoader $composer
-     * @param array       $extensions
      */
-    public function __construct(ClassLoader $composer, $extensions = null)
+    public function __construct(ClassLoader $composer)
     {
         $this->composer = $composer;
     }
@@ -69,7 +63,6 @@ class Resolver
             $classes = array_values(array_filter($classes, function ($className) use ($instanceOf) {
                 return is_subclass_of($className, $instanceOf);
             }));
-
         }
 
         return $classes;
@@ -104,6 +97,9 @@ class Resolver
     }
 
     /**
+     * Find the best psr4 namespace prefix, based on the supplied namespace, and
+     * list of provided prefix
+     *
      * @param string $namespace
      * @param array  $prefixes
      * @return string
@@ -114,6 +110,7 @@ class Resolver
 
         // find the best matching prefix!
         foreach ($prefixes as $prefix) {
+            // if we have a match, and it's longer than the previous match
             if (substr($namespace, 0, strlen($prefix)) == $prefix &&
                 strlen($prefix) > strlen($prefixResult)
             ) {
@@ -125,6 +122,7 @@ class Resolver
 
     /**
      * Convert the supplied namespace string into a standard format
+     * no prefix, ends with trailing slash
      *
      * Example:
      * Psr4\Prefix\
@@ -136,7 +134,6 @@ class Resolver
      */
     private function normalise(string $namespace): string
     {
-
         $tidy = trim($namespace, '\\');
         if (!$tidy) {
             throw new Exception('Invalid namespace', 100);

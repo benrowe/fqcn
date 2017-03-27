@@ -80,5 +80,4 @@ class ResolveTest extends \PHPUnit_Framework_TestCase
             'slashes' => ['\\'],
         ];
     }
-
 }
