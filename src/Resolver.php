@@ -83,13 +83,24 @@ class Resolver
 
         $prefixes = $this->composer->getPrefixesPsr4();
         // pluck the best namespace from the available
-        $prefix   = $this->findPrefix($namespace, array_keys($prefixes));
-        if (!$prefix) {
+        $namespacePrefix   = $this->findNamespacePrefix($namespace, array_keys($prefixes));
+        if (!$namespacePrefix) {
             throw new Exception('Could not find registered psr4 prefix that matches '.$namespace);
         }
 
-        $directories = $prefixes[$prefix];
+        return $this->buildDirectoryList($prefixes[$namespacePrefix], $namespace, $namespacePrefix);
+    }
 
+    /**
+     * Build a list of absolute paths, for the given namespace, based on the relative $prefix
+     *
+     * @param  array  $directories the list of directories (their position relates to $prefix)
+     * @param  string $namespace   The base namespace
+     * @param  string $prefix      The psr4 namespace related to the list of provided directories
+     * @return [type]              [description]
+     */
+    private function buildDirectoryList(array $directories, string $namespace, string $prefix): array
+    {
         $discovered = [];
         foreach ($directories as $path) {
             $path = $this->findAbsolutePathForPsr4($namespace, $prefix, $path);
@@ -106,15 +117,15 @@ class Resolver
      * list of provided prefix
      *
      * @param string $namespace
-     * @param array  $prefixes
+     * @param array  $namespacePrefixes
      * @return string
      */
-    private function findPrefix(string $namespace, array $prefixes): string
+    private function findNamespacePrefix(string $namespace, array $namespacePrefixes): string
     {
         $prefixResult = '';
 
         // find the best matching prefix!
-        foreach ($prefixes as $prefix) {
+        foreach ($namespacePrefixes as $prefix) {
             // if we have a match, and it's longer than the previous match
             if (substr($namespace, 0, strlen($prefix)) == $prefix &&
                 strlen($prefix) > strlen($prefixResult)
@@ -160,6 +171,8 @@ class Resolver
      */
     private function findAbsolutePathForPsr4(string $namespace, string $psr4Prefix, string $psr4Path): string
     {
+        // calculate the diff between the entire namespace and the prefix
+        // this will translate into a directory map based on the psr4 standard
         $relFqn = trim(substr($namespace, strlen($psr4Prefix)), '\\/');
         $path =
             $psr4Path .
