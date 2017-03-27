@@ -143,13 +143,15 @@ class Resolver
     }
 
     /**
-     * Get an absolute path for the provided namespace, based on a existing directory and its psr4 prefix
+     * Get an absolute path for the provided namespace, based on a existing
+     * directory and its psr4 prefix
      *
      * @param string $namespace
      * @param string $psr4Prefix the psr4 prefix
      * @param string $psr4Path and it's related path
-     * @return string the absolute directory path the provided namespace, given the correct prefix and path
-     *                empty string if path cant be resolved
+     * @return string the absolute directory path the provided namespace, given
+     *                    the correct prefix and path empty string if path can't
+     *                    be resolved
      */
     private function findAbsolutePathForPsr4(string $namespace, string $psr4Prefix, string $psr4Path): string
     {
