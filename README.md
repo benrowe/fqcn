@@ -20,6 +20,12 @@ $ composer require benrowe/fqcn
 ## Usage
 
 ``` php
+<?php
+
+$composer = require './vendor/autoload.php';
+$resolver = \Benrowe\Fqcn\Resolver($composer);
+// get an array of available directories that map to this namespace
+$dirs = $resolver->resolveDirectory('Benrowe\Fqcn');
 
 ```
 
