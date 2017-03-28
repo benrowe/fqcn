@@ -48,25 +48,16 @@ class Resolver
         $namespace = $this->normalise($namespace);
         $availablePaths = $this->resolveDirectory($namespace);
 
-        $classes = [];
-        foreach ($availablePaths as $path) {
-            foreach ($this->getDirectoryIterator($path) as $file) {
-                $fqcn = $namespace.strtr(substr($file[0], strlen($path) + 1, -4), '//', '\\');
-                if ($this->langaugeConstructExists($fqcn)) {
-                    $classes[] = $fqcn;
-                }
-            }
-        }
+        $constructs = $this->findNamespacedConstuctsInDirectories($availablePaths, $namespace);
 
-        sort($classes);
-
+        // apply filtering
         if ($instanceOf) {
-            $classes = array_values(array_filter($classes, function ($className) use ($instanceOf) {
-                return is_subclass_of($className, $instanceOf);
+            $constructs = array_values(array_filter($constructs, function ($constructName) use ($instanceOf) {
+                return is_subclass_of($constructName, $instanceOf);
             }));
         }
 
-        return $classes;
+        return $constructs;
     }
 
     /**
@@ -226,5 +217,48 @@ class Resolver
             class_exists($artifactName, $autoload) ||
             interface_exists($artifactName, $autoload) ||
             trait_exists($artifactName, $autoload);
+    }
+
+    /**
+     * Process a list of directories, searching for langauge constructs (classes,
+     * interfaces, traits) that exist in them, based on the supplied base
+     * namespace
+     *
+     * @param  array  $directories list of absolute directory paths
+     * @param  string $namespace   The namespace these directories are representing
+     * @return array
+     */
+    private function findNamespacedConstuctsInDirectories(array $directories, string $namespace): array
+    {
+        $constructs = [];
+        foreach ($directories as $path) {
+            $constructs = array_merge($constructs, $this->findNamespacedConstuctsInDirectory($path, $namespace));
+        }
+
+        sort($constructs);
+
+        return $constructs;
+    }
+
+    /**
+     * Recurisvely scan the supplied directory for langauge constructs that are
+     * $namespaced
+     *
+     * @param  string $directory The directory to scan
+     * @param  string $namespace the namespace that represents this directory
+     * @return array
+     */
+    private function findNamespacedConstuctsInDirectory(string $directory, string $namespace): array
+    {
+        $constructs = [];
+
+        foreach ($this->getDirectoryIterator($directory) as $file) {
+            $fqcn = $namespace.strtr(substr($file[0], strlen($directory) + 1, -4), '//', '\\');
+            if ($this->langaugeConstructExists($fqcn)) {
+                $constructs[] = $fqcn;
+            }
+        }
+
+        return $constructs;
     }
 }
