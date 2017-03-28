@@ -51,7 +51,7 @@ class Resolver
         $constructs = $this->findNamespacedConstuctsInDirectories($availablePaths, $namespace);
 
         // apply filtering
-        if ($instanceOf) {
+        if ($instanceOf !== null) {
             $constructs = array_values(array_filter($constructs, function ($constructName) use ($instanceOf) {
                 return is_subclass_of($constructName, $instanceOf);
             }));
