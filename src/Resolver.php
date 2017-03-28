@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Benrowe\Fqcn;
 
 use Composer\Autoload\ClassLoader;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RecursiveRegexIterator;
+use RegexIterator;
 
 /**
  * Resolver
@@ -44,32 +48,23 @@ class Resolver
         $namespace = $this->normalise($namespace);
         $availablePaths = $this->resolveDirectory($namespace);
 
-        $classes = [];
-        foreach ($availablePaths as $path) {
-            foreach ($this->getDirectoryIterator($path) as $file) {
-                $fqcn = $namespace.strtr(substr($file[0], strlen($path) + 1, -4), '//', '\\');
-                if ($this->langaugeConstructExists($fqcn)) {
-                    $classes[] = $fqcn;   
-                }
-            }
-        }
+        $constructs = $this->findNamespacedConstuctsInDirectories($availablePaths, $namespace);
 
-        sort($classes);
-
-        if ($instanceOf) {
-            $classes = array_values(array_filter($classes, function ($className) use ($instanceOf) {
-                return is_subclass_of($className, $instanceOf);
+        // apply filtering
+        if ($instanceOf !== null) {
+            $constructs = array_values(array_filter($constructs, function ($constructName) use ($instanceOf) {
+                return is_subclass_of($constructName, $instanceOf);
             }));
         }
 
-        return $classes;
+        return $constructs;
     }
 
     /**
-     * Resolve a psr4 based namespace to an absolute directory
+     * Resolve a psr4 based namespace to a list of absolute directory paths
      *
      * @param string $namespace
-     * @return array
+     * @return array list of directories this namespace is mapped to
      * @throws Exception
      */
     public function resolveDirectory(string $namespace): array
@@ -77,13 +72,27 @@ class Resolver
         $namespace = $this->normalise($namespace);
 
         $prefixes = $this->composer->getPrefixesPsr4();
-        $prefix   = $this->findPrefix($namespace, array_keys($prefixes));
-        if (!$prefix) {
+        // pluck the best namespace from the available
+        $namespacePrefix   = $this->findNamespacePrefix($namespace, array_keys($prefixes));
+        if (!$namespacePrefix) {
             throw new Exception('Could not find registered psr4 prefix that matches '.$namespace);
         }
 
+        return $this->buildDirectoryList($prefixes[$namespacePrefix], $namespace, $namespacePrefix);
+    }
+
+    /**
+     * Build a list of absolute paths, for the given namespace, based on the relative $prefix
+     *
+     * @param  array  $directories the list of directories (their position relates to $prefix)
+     * @param  string $namespace   The base namespace
+     * @param  string $prefix      The psr4 namespace related to the list of provided directories
+     * @return array directory paths for provided namespace
+     */
+    private function buildDirectoryList(array $directories, string $namespace, string $prefix): array
+    {
         $discovered = [];
-        foreach ($prefixes[$prefix] as $path) {
+        foreach ($directories as $path) {
             $path = $this->findAbsolutePathForPsr4($namespace, $prefix, $path);
             // convert the rest of the relative path, from the prefix into a directory slug
             if ($path && is_dir($path)) {
@@ -98,15 +107,15 @@ class Resolver
      * list of provided prefix
      *
      * @param string $namespace
-     * @param array  $prefixes
+     * @param array  $namespacePrefixes
      * @return string
      */
-    private function findPrefix(string $namespace, array $prefixes): string
+    private function findNamespacePrefix(string $namespace, array $namespacePrefixes): string
     {
         $prefixResult = '';
 
         // find the best matching prefix!
-        foreach ($prefixes as $prefix) {
+        foreach ($namespacePrefixes as $prefix) {
             // if we have a match, and it's longer than the previous match
             if (substr($namespace, 0, strlen($prefix)) == $prefix &&
                 strlen($prefix) > strlen($prefixResult)
@@ -152,6 +161,8 @@ class Resolver
      */
     private function findAbsolutePathForPsr4(string $namespace, string $psr4Prefix, string $psr4Path): string
     {
+        // calculate the diff between the entire namespace and the prefix
+        // this will translate into a directory map based on the psr4 standard
         $relFqn = trim(substr($namespace, strlen($psr4Prefix)), '\\/');
         $path =
             $psr4Path .
@@ -170,29 +181,84 @@ class Resolver
      * Retrieve a directory iterator for the supplied path
      *
      * @param  string $path The directory to iterate
-     * @return \RegexIterator
+     * @return RegexIterator
      */
-    private function getDirectoryIterator(string $path): \RegexIterator
+    private function getDirectoryIterator(string $path): RegexIterator
     {
-        $dirIterator = new \RecursiveDirectoryIterator($path);
-        $iterator = new \RecursiveIteratorIterator($dirIterator);
-        return new \RegexIterator($iterator, '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
+        $dirIterator = new RecursiveDirectoryIterator($path);
+        $iterator = new RecursiveIteratorIterator($dirIterator);
+        return new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
     }
-    
+
     /**
      * Determine if the construct (class, interface or trait) exists
-     * 
+     *
      * @param string $artifactName
      * @return bool
      */
     private function langaugeConstructExists(string $artifactName): bool
     {
         return
-            class_exists($artifactName, false) || 
-            interface_exists($artifactName, false) || 
-            trait_exists($artifactName, false) ||
-            class_exists($artifactName) || 
-            interface_exists($artifactName) || 
-            trait_exists($artifactName);
+            $this->checkConstructExists($artifactName, false) ||
+            $this->checkConstructExists($artifactName);
+    }
+
+    /**
+     * Determine if the contract exists
+     *
+     * @param  string $artifactName
+     * @param  bool $autoload trigger the autoloader to be fired, if the construct
+     *                        doesn't exist
+     * @return bool
+     */
+    private function checkConstructExists(string $artifactName, bool $autoload = true): bool
+    {
+        return
+            class_exists($artifactName, $autoload) ||
+            interface_exists($artifactName, $autoload) ||
+            trait_exists($artifactName, $autoload);
+    }
+
+    /**
+     * Process a list of directories, searching for langauge constructs (classes,
+     * interfaces, traits) that exist in them, based on the supplied base
+     * namespace
+     *
+     * @param  array  $directories list of absolute directory paths
+     * @param  string $namespace   The namespace these directories are representing
+     * @return array
+     */
+    private function findNamespacedConstuctsInDirectories(array $directories, string $namespace): array
+    {
+        $constructs = [];
+        foreach ($directories as $path) {
+            $constructs = array_merge($constructs, $this->findNamespacedConstuctsInDirectory($path, $namespace));
+        }
+
+        sort($constructs);
+
+        return $constructs;
+    }
+
+    /**
+     * Recurisvely scan the supplied directory for langauge constructs that are
+     * $namespaced
+     *
+     * @param  string $directory The directory to scan
+     * @param  string $namespace the namespace that represents this directory
+     * @return array
+     */
+    private function findNamespacedConstuctsInDirectory(string $directory, string $namespace): array
+    {
+        $constructs = [];
+
+        foreach ($this->getDirectoryIterator($directory) as $file) {
+            $fqcn = $namespace.strtr(substr($file[0], strlen($directory) + 1, -4), '//', '\\');
+            if ($this->langaugeConstructExists($fqcn)) {
+                $constructs[] = $fqcn;
+            }
+        }
+
+        return $constructs;
     }
 }
