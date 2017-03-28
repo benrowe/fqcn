@@ -10,7 +10,6 @@ use RecursiveIteratorIterator;
 use RecursiveRegexIterator;
 use RegexIterator;
 
-
 /**
  * Resolver
  * Resolve a php psr4 namespace to a directory
@@ -97,7 +96,7 @@ class Resolver
      * @param  array  $directories the list of directories (their position relates to $prefix)
      * @param  string $namespace   The base namespace
      * @param  string $prefix      The psr4 namespace related to the list of provided directories
-     * @return [type]              [description]
+     * @return array directory paths for provided namespace
      */
     private function buildDirectoryList(array $directories, string $namespace, string $prefix): array
     {
