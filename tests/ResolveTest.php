@@ -72,7 +72,7 @@ class ResolveTest extends \PHPUnit_Framework_TestCase
         $this->resolve->setNamespace($namespace);
     }
 
-    public function testFindClasses()
+    public function testfindConstructs()
     {
         $this->resolve->setNamespace(__NAMESPACE__.'\\Test');
         $this->assertSame([
@@ -82,7 +82,7 @@ class ResolveTest extends \PHPUnit_Framework_TestCase
             'Benrowe\Fqcn\Test\Example\ExampleBase',
             'Benrowe\Fqcn\Test\Example\SomeInterface',
             'Benrowe\Fqcn\Test\Standalone',
-        ], $this->resolve->findClasses());
+        ], $this->resolve->findConstructs());
     }
 
     public function testFindClassesInstanceOf()
@@ -91,7 +91,7 @@ class ResolveTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([
             'Benrowe\Fqcn\Test\ExampleBase',
             'Benrowe\Fqcn\Test\Example\ExampleBase',
-        ], $this->resolve->findClasses(__NAMESPACE__.'\\Test\\Base'));
+        ], $this->resolve->findConstructs(__NAMESPACE__.'\\Test\\Base'));
     }
 
     public function dataInvalidNamespace()

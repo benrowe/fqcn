@@ -24,7 +24,7 @@ use RegexIterator;
  * $composer = require './vendor/autoload.php';
  * $resolver = new Benrowe\Fqcn\Resolver('Namespace\\To\\Search\\For', $composer);
  * $resolver->findDirectories() // => list of directories
- * $resolver->findClasses() => lists of all language constructs found under the namespace
+ * $resolver->findConstructs() => lists of all language constructs found under the namespace
  * ```
  *
  * @package Benrowe\Fqcn
@@ -79,13 +79,13 @@ class Resolver
     }
 
     /**
-     * Find all of the avaiable classes under a specific namespace
+     * Find all of the avaiable constructs under a specific namespace
      *
      * @param  string $instanceOf optional, restrict the classes found to those
      *                            that extend from this base
      * @return array a list of FQCN's that match
      */
-    public function findClasses(string $instanceOf = null): array
+    public function findConstructs(string $instanceOf = null): array
     {
         $availablePaths = $this->findDirectories();
 
@@ -209,30 +209,30 @@ class Resolver
     /**
      * Determine if the construct (class, interface or trait) exists
      *
-     * @param string $artifactName
+     * @param string $constructName
      * @return bool
      */
-    private function langaugeConstructExists(string $artifactName): bool
+    private function langaugeConstructExists(string $constructName): bool
     {
         return
-            $this->checkConstructExists($artifactName, false) ||
-            $this->checkConstructExists($artifactName);
+            $this->checkConstructExists($constructName, false) ||
+            $this->checkConstructExists($constructName);
     }
 
     /**
-     * Determine if the contract exists
+     * Determine if the construct exists
      *
-     * @param  string $artifactName
+     * @param  string $constructName
      * @param  bool $autoload trigger the autoloader to be fired, if the construct
      *                        doesn't exist
      * @return bool
      */
-    private function checkConstructExists(string $artifactName, bool $autoload = true): bool
+    private function checkConstructExists(string $constructName, bool $autoload = true): bool
     {
         return
-            class_exists($artifactName, $autoload) ||
-            interface_exists($artifactName, $autoload) ||
-            trait_exists($artifactName, $autoload);
+            class_exists($constructName, $autoload) ||
+            interface_exists($constructName, $autoload) ||
+            trait_exists($constructName, $autoload);
     }
 
     /**
