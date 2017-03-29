@@ -56,6 +56,11 @@ class Resolver
         $this->namespace = $namespace;
     }
 
+    /**
+     * Get the current namespace
+     * 
+     * @return Psr4Namespace
+     */
     public function getNamespace(): Psr4Namespace
     {
         return $this->namespace;
