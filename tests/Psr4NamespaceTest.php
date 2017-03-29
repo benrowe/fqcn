@@ -24,4 +24,26 @@ class Psr4NamespaceTest extends \PHPUnit_Framework_TestCase
         $namespace = new Psr4Namespace('\\Something\\Haha\\Other\\');
         $this->assertTrue($namespace->equals(new Psr4Namespace('Something\\Haha\\Other')));
     }
+
+    /**
+     * @dataProvider dataInvalidNamespace
+     * @expectedException \Benrowe\Fqcn\Exception
+     *
+     * @param  string $namespace
+     * @return void
+     */
+    public function testInvalidData($namespace)
+    {
+        $namespace = new Psr4Namespace($namespace);
+    }
+
+    public function dataInvalidNamespace()
+    {
+        return [
+            'empty' => [''],
+            'invalid-chars' => ['something-cool/haha'],
+            'numbers' => ['4Something'],
+        ];
+    }
+
 }
