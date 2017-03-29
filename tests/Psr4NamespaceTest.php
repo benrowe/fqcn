@@ -43,7 +43,7 @@ class Psr4NamespaceTest extends \PHPUnit_Framework_TestCase
             'empty' => [''],
             'invalid-chars' => ['something-cool/haha'],
             'numbers' => ['4Something'],
+            'hack' => ['\\\\\\']
         ];
     }
-
 }
