@@ -13,28 +13,47 @@ final class Psr4Namespace
 {
     private $namespace;
 
+    /**
+     * Constructor
+     * Take in the namespace value as a string
+     *
+     * @param string $namespace
+     */
     public function __construct(string $namespace)
     {
         $this->setValue($namespace);
     }
 
-    private function setValue($value)
+    /**
+     * Handle setting the namepsace string value
+     *
+     * @param string $value
+     */
+    private function setValue(string $value)
     {
+        // standardise the value
         $value = trim($value, '\\');
+        // validate the namespace!
         if (!$value) {
             throw new Exception('Invalid Namespace');
         }
         $this->namespace = $value . '\\';
     }
 
+    /**
+     * Get the namespace value as a string
+     *
+     * @return string
+     */
     public function getValue(): string
     {
         return $this->namespace;
     }
 
     /**
-     * [__toString description]
-     * @return string [description]
+     * Handle the object when treated as a string
+     *
+     * @return string
      */
     public function __toString(): string
     {
