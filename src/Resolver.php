@@ -24,7 +24,7 @@ use RegexIterator;
  * $composer = require './vendor/autoload.php';
  * $resolver = new Benrowe\Fqcn\Resolver('Namespace\\To\\Search\\For', $composer);
  * $resolver->findDirectories() // => list of directories
- * $resolver->findClasses() =>
+ * $resolver->findClasses() => lists of all language constructs found under the namespace
  * ```
  *
  * @package Benrowe\Fqcn
