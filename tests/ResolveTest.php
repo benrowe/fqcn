@@ -20,7 +20,7 @@ class ResolveTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $composer = require './vendor/autoload.php';
-        $this->resolve = new Resolver($composer);
+        $this->resolve = new Resolver('Example', $composer);
     }
 
     public function testResolve()

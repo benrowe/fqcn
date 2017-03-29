@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Benrowe\Fqcn;
 
+use Benrowe\Fqcn\Value\Psr4Namespace;
 use Composer\Autoload\ClassLoader;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -26,13 +27,38 @@ class Resolver
     private $composer;
 
     /**
+     * @var Psr4Namespace
+     */
+    private $namespace;
+
+    /**
      * Resolver constructor.
      *
+     * @param Psr4Namespace|string $namespace
      * @param ClassLoader $composer
      */
-    public function __construct(ClassLoader $composer)
+    public function __construct($namespace, ClassLoader $composer)
     {
+        $this->setNamespace($namespace);
         $this->composer = $composer;
+    }
+
+    /**
+     * Set the namespace to resolve
+     *
+     * @param Psr4Namespace|string $namespace $namespace
+     */
+    public function setNamespace($namespace)
+    {
+        if (!($namespace instanceof Psr4Namespace)) {
+            $namespace = new Psr4Namespace($namespace);
+        }
+        $this->namespace = $namespace;
+    }
+
+    public function getNamespace(): Psr4Namespace
+    {
+        return $this->namespace;
     }
 
     /**
