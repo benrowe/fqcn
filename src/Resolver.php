@@ -12,8 +12,20 @@ use RecursiveRegexIterator;
 use RegexIterator;
 
 /**
- * Resolver
- * Resolve a php psr4 namespace to a directory
+ * Psr4 Resolver
+ *
+ * Help resolve a PHP PSR-4 namespace to a directory + resolve language
+ * constructs (classes, interfaces and traits) that implement the provided
+ * namespace
+ *
+ * Example:
+ *
+ * ```php
+ * $composer = require './vendor/autoload.php';
+ * $resolver = new Benrowe\Fqcn\Resolver('Namespace\\To\\Search\\For', $composer);
+ * $resolver->resolveDirectory() // => list of directories
+ * $resolver->findClasses() =>
+ * ```
  *
  * @package Benrowe\Fqcn
  */
