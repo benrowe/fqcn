@@ -58,7 +58,7 @@ class Resolver
 
     /**
      * Get the current namespace
-     * 
+     *
      * @return Psr4Namespace
      */
     public function getNamespace(): Psr4Namespace
@@ -69,17 +69,15 @@ class Resolver
     /**
      * Find all of the avaiable classes under a specific namespace
      *
-     * @param  string $namespace  The namespace to search for
      * @param  string $instanceOf optional, restrict the classes found to those
      *                            that extend from this base
      * @return array a list of FQCN's that match
      */
-    public function findClasses(string $namespace, string $instanceOf = null): array
+    public function findClasses(string $instanceOf = null): array
     {
-        $namespace = $this->normalise($namespace);
-        $availablePaths = $this->resolveDirectory($namespace);
+        $availablePaths = $this->resolveDirectory();
 
-        $constructs = $this->findNamespacedConstuctsInDirectories($availablePaths, $namespace);
+        $constructs = $this->findNamespacedConstuctsInDirectories($availablePaths, $this->namespace);
 
         // apply filtering
         if ($instanceOf !== null) {
@@ -94,33 +92,30 @@ class Resolver
     /**
      * Resolve a psr4 based namespace to a list of absolute directory paths
      *
-     * @param string $namespace
      * @return array list of directories this namespace is mapped to
      * @throws Exception
      */
-    public function resolveDirectory(string $namespace): array
+    public function resolveDirectory(): array
     {
-        $namespace = $this->normalise($namespace);
-
         $prefixes = $this->composer->getPrefixesPsr4();
         // pluck the best namespace from the available
-        $namespacePrefix   = $this->findNamespacePrefix($namespace, array_keys($prefixes));
+        $namespacePrefix   = $this->findNamespacePrefix($this->namespace, array_keys($prefixes));
         if (!$namespacePrefix) {
-            throw new Exception('Could not find registered psr4 prefix that matches '.$namespace);
+            throw new Exception('Could not find registered psr4 prefix that matches '.$this->namespace);
         }
 
-        return $this->buildDirectoryList($prefixes[$namespacePrefix], $namespace, $namespacePrefix);
+        return $this->buildDirectoryList($prefixes[$namespacePrefix], $this->namespace, $namespacePrefix);
     }
 
     /**
      * Build a list of absolute paths, for the given namespace, based on the relative $prefix
      *
      * @param  array  $directories the list of directories (their position relates to $prefix)
-     * @param  string $namespace   The base namespace
+     * @param  Psr4Namespace $namespace   The base namespace
      * @param  string $prefix      The psr4 namespace related to the list of provided directories
      * @return array directory paths for provided namespace
      */
-    private function buildDirectoryList(array $directories, string $namespace, string $prefix): array
+    private function buildDirectoryList(array $directories, Psr4Namespace $namespace, string $prefix): array
     {
         $discovered = [];
         foreach ($directories as $path) {
@@ -137,46 +132,24 @@ class Resolver
      * Find the best psr4 namespace prefix, based on the supplied namespace, and
      * list of provided prefix
      *
-     * @param string $namespace
+     * @param Psr4Namespace $namespace
      * @param array  $namespacePrefixes
      * @return string
      */
-    private function findNamespacePrefix(string $namespace, array $namespacePrefixes): string
+    private function findNamespacePrefix(Psr4Namespace $namespace, array $namespacePrefixes): string
     {
         $prefixResult = '';
 
         // find the best matching prefix!
         foreach ($namespacePrefixes as $prefix) {
             // if we have a match, and it's longer than the previous match
-            if (substr($namespace, 0, strlen($prefix)) == $prefix &&
+            if (substr($namespace->getValue(), 0, strlen($prefix)) == $prefix &&
                 strlen($prefix) > strlen($prefixResult)
             ) {
                 $prefixResult = $prefix;
             }
         }
         return $prefixResult;
-    }
-
-    /**
-     * Convert the supplied namespace string into a standard format
-     * no prefix, ends with trailing slash
-     *
-     * Example:
-     * Psr4\Prefix\
-     * Something\
-     *
-     * @param string $namespace
-     * @return string
-     * @throws Exception
-     */
-    private function normalise(string $namespace): string
-    {
-        $tidy = trim($namespace, '\\');
-        if (!$tidy) {
-            throw new Exception('Invalid namespace', 100);
-        }
-
-        return $tidy . '\\';
     }
 
     /**
@@ -190,11 +163,11 @@ class Resolver
      *                    the correct prefix and path empty string if path can't
      *                    be resolved
      */
-    private function findAbsolutePathForPsr4(string $namespace, string $psr4Prefix, string $psr4Path): string
+    private function findAbsolutePathForPsr4(Psr4Namespace $namespace, string $psr4Prefix, string $psr4Path): string
     {
         // calculate the diff between the entire namespace and the prefix
         // this will translate into a directory map based on the psr4 standard
-        $relFqn = trim(substr($namespace, strlen($psr4Prefix)), '\\/');
+        $relFqn = trim(substr($namespace->getValue(), strlen($psr4Prefix)), '\\/');
         $path =
             $psr4Path .
             DIRECTORY_SEPARATOR .
@@ -256,10 +229,10 @@ class Resolver
      * namespace
      *
      * @param  array  $directories list of absolute directory paths
-     * @param  string $namespace   The namespace these directories are representing
+     * @param  Psr4Namespace $namespace   The namespace these directories are representing
      * @return array
      */
-    private function findNamespacedConstuctsInDirectories(array $directories, string $namespace): array
+    private function findNamespacedConstuctsInDirectories(array $directories, Psr4Namespace $namespace): array
     {
         $constructs = [];
         foreach ($directories as $path) {
@@ -276,10 +249,10 @@ class Resolver
      * $namespaced
      *
      * @param  string $directory The directory to scan
-     * @param  string $namespace the namespace that represents this directory
+     * @param  Psr4Namespace $namespace the namespace that represents this directory
      * @return array
      */
-    private function findNamespacedConstuctsInDirectory(string $directory, string $namespace): array
+    private function findNamespacedConstuctsInDirectory(string $directory, Psr4Namespace $namespace): array
     {
         $constructs = [];
 

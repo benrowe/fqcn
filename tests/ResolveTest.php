@@ -42,12 +42,14 @@ class ResolveTest extends \PHPUnit_Framework_TestCase
 
     public function testResolve()
     {
-        $this->assertSame([__DIR__.DIRECTORY_SEPARATOR.'Test'], $this->resolve->resolveDirectory('\Benrowe\Fqcn\Test'));
+        $this->resolve->setNamespace('\Benrowe\Fqcn\Test');
+        $this->assertSame([__DIR__.DIRECTORY_SEPARATOR.'Test'], $this->resolve->resolveDirectory());
     }
 
     public function testResolveDoesntExist()
     {
-        $this->assertSame([], $this->resolve->resolveDirectory('\Benrowe\Fqcn\Madeup'));
+        $this->resolve->setNamespace('\Benrowe\Fqcn\Madeup');
+        $this->assertSame([], $this->resolve->resolveDirectory());
     }
 
     /**
@@ -56,22 +58,23 @@ class ResolveTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnknownResolve()
     {
-        $this->assertSame(__DIR__, $this->resolve->resolveDirectory('\ThisDoesNotExist\\'));
+        $this->resolve->setNamespace('\ThisDoesNotExist\\');
+        $this->assertSame(__DIR__, $this->resolve->resolveDirectory());
     }
 
     /**
      * @expectedException Exception
-     * @expectedExceptionCode 100
      * @dataProvider dataInvalidNamespace
      * @param $namespace
      */
     public function testInvalidNamespace($namespace)
     {
-        $this->resolve->resolveDirectory($namespace);
+        $this->resolve->setNamespace($namespace);
     }
 
     public function testFindClasses()
     {
+        $this->resolve->setNamespace(__NAMESPACE__.'\\Test');
         $this->assertSame([
             'Benrowe\Fqcn\Test\Base',
             'Benrowe\Fqcn\Test\ExampleBase',
@@ -79,15 +82,16 @@ class ResolveTest extends \PHPUnit_Framework_TestCase
             'Benrowe\Fqcn\Test\Example\ExampleBase',
             'Benrowe\Fqcn\Test\Example\SomeInterface',
             'Benrowe\Fqcn\Test\Standalone',
-        ], $this->resolve->findClasses(__NAMESPACE__.'\\Test'));
+        ], $this->resolve->findClasses());
     }
 
     public function testFindClassesInstanceOf()
     {
+        $this->resolve->setNamespace(__NAMESPACE__.'\\Test');
         $this->assertSame([
             'Benrowe\Fqcn\Test\ExampleBase',
             'Benrowe\Fqcn\Test\Example\ExampleBase',
-        ], $this->resolve->findClasses(__NAMESPACE__.'\\Test', __NAMESPACE__.'\\Test\\Base'));
+        ], $this->resolve->findClasses(__NAMESPACE__.'\\Test\\Base'));
     }
 
     public function dataInvalidNamespace()
