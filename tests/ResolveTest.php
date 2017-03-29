@@ -2,6 +2,7 @@
 
 namespace Benrowe\Fqcn;
 
+use Benrowe\Fqcn\Value\Psr4Namespace;
 use Benrowe\Fqcn\Exception;
 use Benrowe\Fqcn\Resolver;
 
@@ -20,7 +21,23 @@ class ResolveTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $composer = require './vendor/autoload.php';
-        $this->resolve = new Resolver('Example', $composer);
+        $this->resolve = new Resolver('Example\\Namespace\\', $composer);
+    }
+
+    public function testGet()
+    {
+        $tmp = new Psr4Namespace('Example\\Namespace');
+        $this->assertTrue($tmp->equals($this->resolve->getNamespace()));
+    }
+
+    public function testSet()
+    {
+        $tmp = new Psr4Namespace('Hello');
+        $this->resolve->setNamespace($tmp);
+        $this->assertTrue($tmp->equals($this->resolve->getNamespace()));
+
+        $this->resolve->setNamespace('Hello\\');
+        $this->assertTrue($tmp->equals($this->resolve->getNamespace()));
     }
 
     public function testResolve()
