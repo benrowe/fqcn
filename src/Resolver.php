@@ -23,7 +23,7 @@ use RegexIterator;
  * ```php
  * $composer = require './vendor/autoload.php';
  * $resolver = new Benrowe\Fqcn\Resolver('Namespace\\To\\Search\\For', $composer);
- * $resolver->resolveDirectory() // => list of directories
+ * $resolver->findDirectories() // => list of directories
  * $resolver->findClasses() =>
  * ```
  *
@@ -87,7 +87,7 @@ class Resolver
      */
     public function findClasses(string $instanceOf = null): array
     {
-        $availablePaths = $this->resolveDirectory();
+        $availablePaths = $this->findDirectories();
 
         $constructs = $this->findNamespacedConstuctsInDirectories($availablePaths, $this->namespace);
 
@@ -107,7 +107,7 @@ class Resolver
      * @return array list of directories this namespace is mapped to
      * @throws Exception
      */
-    public function resolveDirectory(): array
+    public function findDirectories(): array
     {
         $prefixes = $this->composer->getPrefixesPsr4();
         // pluck the best namespace from the available

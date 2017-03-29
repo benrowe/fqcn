@@ -43,13 +43,13 @@ class ResolveTest extends \PHPUnit_Framework_TestCase
     public function testResolve()
     {
         $this->resolve->setNamespace('\Benrowe\Fqcn\Test');
-        $this->assertSame([__DIR__.DIRECTORY_SEPARATOR.'Test'], $this->resolve->resolveDirectory());
+        $this->assertSame([__DIR__.DIRECTORY_SEPARATOR.'Test'], $this->resolve->findDirectories());
     }
 
     public function testResolveDoesntExist()
     {
         $this->resolve->setNamespace('\Benrowe\Fqcn\Madeup');
-        $this->assertSame([], $this->resolve->resolveDirectory());
+        $this->assertSame([], $this->resolve->findDirectories());
     }
 
     /**
@@ -59,7 +59,7 @@ class ResolveTest extends \PHPUnit_Framework_TestCase
     public function testUnknownResolve()
     {
         $this->resolve->setNamespace('\ThisDoesNotExist\\');
-        $this->assertSame(__DIR__, $this->resolve->resolveDirectory());
+        $this->assertSame(__DIR__, $this->resolve->findDirectories());
     }
 
     /**
