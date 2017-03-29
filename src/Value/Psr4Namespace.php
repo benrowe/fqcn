@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Benrowe\Fqcn\Value;
 
+use Benrowe\Fqcn\Exception;
+
 /**
  * This represents a psr4 based namespace
  *
@@ -34,10 +36,26 @@ final class Psr4Namespace
         // standardise the value
         $value = trim($value, '\\');
         // validate the namespace!
-        if (!$value) {
+        if (!$this->isValid($value)) {
             throw new Exception('Invalid Namespace');
         }
         $this->namespace = $value . '\\';
+    }
+
+    /**
+     * Determine if the supplied namespace string is a valid according to the
+     * psr4 standard
+     *
+     * @param  string  $namespace
+     * @return boolean
+     */
+    private function isValid(string $namespace): bool
+    {
+        $parts = explode('\\', $namespace);
+        $verified = array_filter($parts, function ($value) {
+            return (bool)preg_match("/^[A-Z][\w\d_]+$/", $value);
+        });
+        return count($parts) === count($verified);
     }
 
     /**
@@ -68,9 +86,6 @@ final class Psr4Namespace
      */
     public function equals(Psr4Namespace $value): bool
     {
-        if ($value instanceof $this) {
-            return $value->getValue() === $this->getValue();
-        }
-        return $value === $this->getValue();
+        return $value->getValue() === $this->getValue();
     }
 }
