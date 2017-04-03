@@ -101,4 +101,13 @@ final class Psr4Namespace
 
         return $start === $value->getValue();
     }
+
+    /**
+     * Get the length of the namepsace as a string (characters)
+     * @return int
+     */
+    public function length(): int
+    {
+        return strlen($this->getValue());
+    }
 }
