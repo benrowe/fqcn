@@ -88,4 +88,17 @@ final class Psr4Namespace
     {
         return $value->getValue() === $this->getValue();
     }
+
+    /**
+     * Determine if this namepsace starts with the supplied namespace
+     *
+     * @param  Psr4Namespace $value
+     * @return bool
+     */
+    public function startsWith(Psr4Namespace $value): bool
+    {
+        $start = substr($this->getValue(), 0, strlen($value->getValue()));
+
+        return $start === $value->getValue();
+    }
 }
