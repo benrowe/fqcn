@@ -116,7 +116,7 @@ class Resolver
             throw new Exception('Could not find registered psr4 prefix that matches '.$this->namespace);
         }
 
-        return $this->buildDirectoryList($prefixes[$namespacePrefix], $this->namespace, $namespacePrefix);
+        return $this->buildDirectoryList($prefixes[$namespacePrefix->getValue()], $this->namespace, $namespacePrefix);
     }
 
     /**
@@ -124,10 +124,10 @@ class Resolver
      *
      * @param  array  $directories the list of directories (their position relates to $prefix)
      * @param  Psr4Namespace $namespace   The base namespace
-     * @param  string $prefix      The psr4 namespace related to the list of provided directories
+     * @param  Psr4Namespace $prefix      The psr4 namespace related to the list of provided directories
      * @return array directory paths for provided namespace
      */
-    private function buildDirectoryList(array $directories, Psr4Namespace $namespace, string $prefix): array
+    private function buildDirectoryList(array $directories, Psr4Namespace $namespace, Psr4Namespace $prefix): array
     {
         $discovered = [];
         foreach ($directories as $path) {
@@ -146,18 +146,20 @@ class Resolver
      *
      * @param Psr4Namespace $namespace
      * @param array  $namespacePrefixes
-     * @return string
+     * @return Psr4Namespace
      */
-    private function findNamespacePrefix(Psr4Namespace $namespace, array $namespacePrefixes): string
+    private function findNamespacePrefix(Psr4Namespace $namespace, array $namespacePrefixes)
     {
-        $prefixResult = '';
+        $prefixResult = null;
 
         // find the best matching prefix!
         foreach ($namespacePrefixes as $prefix) {
-            // if we have a match, and it's longer than the previous match
-            if (substr($namespace->getValue(), 0, strlen($prefix)) == $prefix &&
-                strlen($prefix) > strlen($prefixResult)
+            $prefix = new Psr4Namespace($prefix);
+            if (
+                $namespace->startsWith($prefix) &&
+                ($prefixResult === null || $prefix->length() > $prefixResult->length())
             ) {
+                // if we have a match, and it's longer than the previous match
                 $prefixResult = $prefix;
             }
         }
@@ -168,28 +170,16 @@ class Resolver
      * Get an absolute path for the provided namespace, based on a existing
      * directory and its psr4 prefix
      *
-     * @param string $namespace
-     * @param string $psr4Prefix the psr4 prefix
+     * @param Psr4Namespace $namespace
+     * @param Psr4Namespace $psr4Prefix the psr4 prefix
      * @param string $psr4Path and it's related path
      * @return string the absolute directory path the provided namespace, given
      *                    the correct prefix and path empty string if path can't
      *                    be resolved
      */
-    private function findAbsolutePathForPsr4(Psr4Namespace $namespace, string $psr4Prefix, string $psr4Path): string
+    private function findAbsolutePathForPsr4(Psr4Namespace $namespace, Psr4Namespace $psr4Prefix, string $psr4Path): string
     {
-        // calculate the diff between the entire namespace and the prefix
-        // this will translate into a directory map based on the psr4 standard
-        $relFqn = trim(substr($namespace->getValue(), strlen($psr4Prefix)), '\\/');
-        $path =
-            $psr4Path .
-            DIRECTORY_SEPARATOR .
-            strtr($relFqn, [
-                '\\' => DIRECTORY_SEPARATOR,
-                '//' => DIRECTORY_SEPARATOR
-            ]);
-        $path = realpath($path);
-
-        return $path ?: '';
+        return (new PathBuilder($psr4Path, $psr4Prefix))->resolve($namespace);
     }
 
 
