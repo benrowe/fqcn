@@ -18,6 +18,12 @@ class PathBuilder
     private $namespace;
     private $path;
 
+    /**
+     * Constructor
+     * Take in the path & the psr4 namespace it represents
+     * @param string        $path      [description]
+     * @param Psr4Namespace $namespace [description]
+     */
     public function __construct(string $path, Psr4Namespace $namespace)
     {
         if (!is_dir($path)) {
