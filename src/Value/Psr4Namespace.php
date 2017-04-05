@@ -53,7 +53,7 @@ final class Psr4Namespace
     {
         $parts = explode('\\', $namespace);
         $verified = array_filter($parts, function ($value) {
-            return (bool)preg_match("/^[A-Z][\w\d_]+$/", $value);
+            return (bool)preg_match("/^[A-Za-z][\w\d_]+$/", $value);
         });
         return count($parts) === count($verified);
     }
