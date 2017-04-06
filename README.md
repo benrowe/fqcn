@@ -23,9 +23,9 @@ $ composer require benrowe/fqcn
 <?php
 
 $composer = require './vendor/autoload.php';
-$resolver = \Benrowe\Fqcn\Resolver($composer);
+$resolver = \Benrowe\Fqcn\Resolver('Benrowe\Fqcn', $composer);
 // get an array of available directories that map to this namespace
-$dirs = $resolver->resolveDirectory('Benrowe\Fqcn');
+$dirs = $resolver->findDirectories();
 
 ```
 
