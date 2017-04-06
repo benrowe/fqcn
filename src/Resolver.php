@@ -155,8 +155,7 @@ class Resolver
         // find the best matching prefix!
         foreach ($namespacePrefixes as $prefix) {
             $prefix = new Psr4Namespace($prefix);
-            if (
-                $namespace->startsWith($prefix) &&
+            if ($namespace->startsWith($prefix) &&
                 ($prefixResult === null || $prefix->length() > $prefixResult->length())
             ) {
                 // if we have a match, and it's longer than the previous match

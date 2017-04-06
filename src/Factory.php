@@ -33,7 +33,7 @@ class Factory
     /**
      * Make an instance of the Resolver object using the provided namespace as a
      * string
-     * 
+     *
      * @param  string $namespace
      * @return Resolver
      */

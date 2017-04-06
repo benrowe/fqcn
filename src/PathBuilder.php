@@ -36,14 +36,17 @@ class PathBuilder
     /**
      * Get the absolute directory of the provided namespace, relative to the initial
      * path/namespace
-     * 
+     *
      * @param Psr4Namespace $namespace The namespace you want the directory for
      * @return string the absolute directory path, empty if it does not exist!
      */
     public function resolve(Psr4Namespace $namespace): string
     {
         if (!$namespace->startsWith($this->namespace)) {
-            throw new Exception($namespace->getValue() . ' is not from the same base as ' . $this->namespace->getValue());
+            throw new Exception(
+                $namespace->getValue() . ' is not from the same base as ' .
+                $this->namespace->getValue()
+            );
         }
         $relFqn = substr($namespace->getValue(), strlen($this->namespace->getValue()));
         $relPath = $this->nsToPath($relFqn);
@@ -55,7 +58,7 @@ class PathBuilder
 
     /**
      * Convert a namespace to a path equivilent.
-     * 
+     *
      * @param string $namespace
      * @return string
      */
