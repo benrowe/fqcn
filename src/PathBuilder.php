@@ -33,6 +33,13 @@ class PathBuilder
         $this->path = $path;
     }
 
+    /**
+     * Get the absolute directory of the provided namespace, relative to the initial
+     * path/namespace
+     * 
+     * @param Psr4Namespace $namespace The namespace you want the directory for
+     * @return string the absolute directory path, empty if it does not exist!
+     */
     public function resolve(Psr4Namespace $namespace): string
     {
         if (!$namespace->startsWith($this->namespace)) {
@@ -46,6 +53,12 @@ class PathBuilder
         return $absPath ?: '';
     }
 
+    /**
+     * Convert a namespace to a path equivilent.
+     * 
+     * @param string $namespace
+     * @return string
+     */
     private function nsToPath(string $namespace): string
     {
         return trim(strtr($namespace, [
