@@ -131,7 +131,7 @@ class Resolver
     {
         $discovered = [];
         foreach ($directories as $path) {
-            $path = $this->findAbsolutePathForPsr4($namespace, $prefix, $path);
+            $path = (new PathBuilder($path, $prefix))->resolve($namespace);
             // convert the rest of the relative path, from the prefix into a directory slug
             if ($path && is_dir($path)) {
                 $discovered[] =  $path;
@@ -165,23 +165,6 @@ class Resolver
         }
         return $prefixResult;
     }
-
-    /**
-     * Get an absolute path for the provided namespace, based on a existing
-     * directory and its psr4 prefix
-     *
-     * @param Psr4Namespace $namespace
-     * @param Psr4Namespace $psr4Prefix the psr4 prefix
-     * @param string $psr4Path and it's related path
-     * @return string the absolute directory path the provided namespace, given
-     *                    the correct prefix and path empty string if path can't
-     *                    be resolved
-     */
-    private function findAbsolutePathForPsr4(Psr4Namespace $namespace, Psr4Namespace $psr4Prefix, string $psr4Path): string
-    {
-        return (new PathBuilder($psr4Path, $psr4Prefix))->resolve($namespace);
-    }
-
 
     /**
      * Retrieve a directory iterator for the supplied path
