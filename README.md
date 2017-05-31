@@ -29,6 +29,21 @@ $dirs = $resolver->findDirectories();
 
 ```
 
+With the factory
+
+``` php
+<?php
+
+$composer = require './vendor/autoload.php';
+$factory = new \Benrowe\Fqcn\Factory($composer);
+
+// get an array of available directories that map to this namespace
+$dirs = $factory->make('Benrowe\Fqcn')->findDirectories();
+
+$constructs = $factory->make('Benrowe\Fqcn')->findConstructs();
+
+```
+
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
