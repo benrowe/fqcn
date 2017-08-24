@@ -31,13 +31,27 @@ $dirs = $resolver->findDirectories();
 
 ```
 
+<<<<<<< HEAD
 There is also a factory provided.
+=======
+With the factory
+>>>>>>> develop
 
 ``` php
 <?php
 
+<<<<<<< HEAD
 $factory = new \Benrowe\Fqcn\Factory(require './vendor/autoload.php');
 $factory->make(__NAMESPACE__); // => get a resolver for the current namespace
+=======
+$composer = require './vendor/autoload.php';
+$factory = new \Benrowe\Fqcn\Factory($composer);
+
+// get an array of available directories that map to this namespace
+$dirs = $factory->make('Benrowe\Fqcn')->findDirectories();
+
+$constructs = $factory->make('Benrowe\Fqcn')->findConstructs();
+>>>>>>> develop
 
 ```
 
