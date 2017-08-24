@@ -1,4 +1,4 @@
-# fqcn
+# FQCN (Fully Qualitified Class Name)
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
@@ -7,11 +7,13 @@
 [![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Help resolve psr4 based namespaces to directories and thus related classes, etc
+
+
+Help resolve psr4 based namespaces to directories and thus related language constructs (classes, interfaces &amp; traits).
 
 ## Install
 
-Via Composer
+The best way to install this package is via composer.
 
 ``` bash
 $ composer require benrowe/fqcn
@@ -29,11 +31,19 @@ $dirs = $resolver->findDirectories();
 
 ```
 
+<<<<<<< HEAD
+There is also a factory provided.
+=======
 With the factory
+>>>>>>> develop
 
 ``` php
 <?php
 
+<<<<<<< HEAD
+$factory = new \Benrowe\Fqcn\Factory(require './vendor/autoload.php');
+$factory->make(__NAMESPACE__); // => get a resolver for the current namespace
+=======
 $composer = require './vendor/autoload.php';
 $factory = new \Benrowe\Fqcn\Factory($composer);
 
@@ -41,6 +51,7 @@ $factory = new \Benrowe\Fqcn\Factory($composer);
 $dirs = $factory->make('Benrowe\Fqcn')->findDirectories();
 
 $constructs = $factory->make('Benrowe\Fqcn')->findConstructs();
+>>>>>>> develop
 
 ```
 

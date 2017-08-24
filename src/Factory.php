@@ -23,7 +23,7 @@ class Factory
     /**
      * Factory Constructor
      *
-     * @param ClassLoader $composer [description]
+     * @param ClassLoader $composer Composers class loader
      */
     public function __construct(ClassLoader $composer)
     {

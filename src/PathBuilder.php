@@ -21,8 +21,10 @@ class PathBuilder
     /**
      * Constructor
      * Take in the path & the psr4 namespace it represents
-     * @param string        $path      [description]
-     * @param Psr4Namespace $namespace [description]
+     *
+     * @param string        $path      absolute path
+     * @param Psr4Namespace $namespace namespace that represents the provided
+     * path
      */
     public function __construct(string $path, Psr4Namespace $namespace)
     {

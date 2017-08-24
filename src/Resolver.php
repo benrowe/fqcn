@@ -79,7 +79,7 @@ class Resolver
     }
 
     /**
-     * Find all of the avaiable constructs under a specific namespace
+     * Find all of the available constructs under a specific namespace
      *
      * @param  string $instanceOf optional, restrict the classes found to those
      *                            that extend from this base
@@ -184,7 +184,7 @@ class Resolver
      * @param string $constructName
      * @return bool
      */
-    private function langaugeConstructExists(string $constructName): bool
+    private function languageConstructExists(string $constructName): bool
     {
         return
             $this->checkConstructExists($constructName, false) ||
@@ -208,7 +208,7 @@ class Resolver
     }
 
     /**
-     * Process a list of directories, searching for langauge constructs (classes,
+     * Process a list of directories, searching for language constructs (classes,
      * interfaces, traits) that exist in them, based on the supplied base
      * namespace
      *
@@ -229,7 +229,7 @@ class Resolver
     }
 
     /**
-     * Recurisvely scan the supplied directory for langauge constructs that are
+     * Recurisvely scan the supplied directory for language constructs that are
      * $namespaced
      *
      * @param  string $directory The directory to scan
@@ -242,7 +242,7 @@ class Resolver
 
         foreach ($this->getDirectoryIterator($directory) as $file) {
             $fqcn = $namespace.strtr(substr($file[0], strlen($directory) + 1, -4), '//', '\\');
-            if ($this->langaugeConstructExists($fqcn)) {
+            if ($this->languageConstructExists($fqcn)) {
                 $constructs[] = $fqcn;
             }
         }
