@@ -4,7 +4,12 @@
     "description": "PSR-4 namespace resolver",
     "keywords": [
         "benrowe",
-        "fqcn"
+        "fqcn",
+        "class",
+        "namespace",
+        "autoload",
+        "psr-4",
+        "composer"
     ],
     "homepage": "https://github.com/benrowe/fqcn",
     "license": "MIT",
