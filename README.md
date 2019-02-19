@@ -74,7 +74,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 [ico-version]: https://img.shields.io/packagist/v/benrowe/fqcn.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-circleci]: https://img.shields.io/circleci/project/git/benrowe/fqcn/master.svg
+[ico-circleci]: https://img.shields.io/circleci/project/benrowe/fqcn/master.svg
 [ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/benrowe/fqcn.svg?style=flat-square
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/benrowe/fqcn.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/benrowe/fqcn.svg?style=flat-square
