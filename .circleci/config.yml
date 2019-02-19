@@ -9,7 +9,6 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "composer.json" }}
             - v1-dependencies-
-      - run: composer self-update
       - run: composer install -n --prefer-dist
 
       - save_cache:
