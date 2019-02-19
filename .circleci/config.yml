@@ -10,11 +10,9 @@ jobs:
             - v1-dependencies-{{ checksum "composer.json" }}
             - v1-dependencies-
       - run: composer install -n --prefer-dist
-
       - save_cache:
           key: v1-dependencies-{{ checksum "composer.json" }}
           paths:
             - ./vendor
-
       - run: ./vendor/bin/phpcs --standard=psr2 src/
       - run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
